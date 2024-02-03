@@ -23,7 +23,7 @@ public class TimeServlet extends HttpServlet {
 
         String timeParam = httpServletRequest.getParameter("timezone");
 
-        String lastTimezone = getLastTimezoneFromCookie(httpServletRequest);
+        String lastTimezone = getTimeFromCookie(httpServletRequest);
 
         String timezone;
         if (lastTimezone != null){
@@ -39,9 +39,9 @@ public class TimeServlet extends HttpServlet {
         char charToReplace = 32;
         char replacementChar = '+';
 
-        timezone = replaceCharWithCode(timezone, charToReplace, replacementChar);
+        timezone = replacer(timezone, charToReplace, replacementChar);
 
-        saveLastTimezoneToCookie(httpServletResponse, timezone);
+        saveCookie(httpServletResponse, timezone);
 
         TimeZone timeZone = TimeZone.getTimeZone("GMT+" + timezone);
 
@@ -58,7 +58,7 @@ public class TimeServlet extends HttpServlet {
         engine.process("index.html", context, httpServletResponse.getWriter());
     }
 
-    private String getLastTimezoneFromCookie(HttpServletRequest httpServletRequest) {
+    private String getTimeFromCookie(HttpServletRequest httpServletRequest) {
         Cookie[] cookies = httpServletRequest.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -70,7 +70,7 @@ public class TimeServlet extends HttpServlet {
         return null;
     }
 
-    private static String replaceCharWithCode(String input, char charToReplace, char replacementChar) {
+    private static String replacer(String input, char charToReplace, char replacementChar) {
         char[] charArray = input.toCharArray();
         for (int i = 0; i < charArray.length; i++) {
             if (charArray[i] == charToReplace) {
@@ -80,7 +80,7 @@ public class TimeServlet extends HttpServlet {
         return new String(charArray);
     }
 
-    private void saveLastTimezoneToCookie(HttpServletResponse httpServletResponse, String timezone) {
+    private void saveCookie(HttpServletResponse httpServletResponse, String timezone) {
         Cookie cookie = new Cookie("lastTimezone", timezone);
         httpServletResponse.addCookie(cookie);
     }
