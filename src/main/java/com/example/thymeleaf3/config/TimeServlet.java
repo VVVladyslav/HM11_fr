@@ -24,26 +24,31 @@ public class TimeServlet extends HttpServlet {
         String timeParam = httpServletRequest.getParameter("timezone");
 
         String lastTimezone = getTimeFromCookie(httpServletRequest);
-
         String timezone;
-        if (lastTimezone != null){
-            timezone = lastTimezone;
-        } else if (timeParam != null) {
-            timezone = timeParam;
-        }else {
+
+        if (timeParam == null){
             timezone = "UTC";
+        }else {
+            if (lastTimezone != null) {
+                timezone = lastTimezone;
+            } else if (timeParam != null) {
+                timezone = timeParam;
+            } else {
+                timezone = "UTC";
+            }
+            timezone = timezone.replace("%2b", "+");
+            timezone = timezone.replace("32", "+");
+
+            char charToReplace = 32;
+            char replacementChar = '+';
+
+            timezone = replacer(timezone, charToReplace, replacementChar);
+
+            saveCookie(httpServletResponse, timezone);
         }
-        timezone = timezone.replace("%2b", "+");
-        timezone = timezone.replace("32", "+");
+        timezone = timezone.replace("UTC", "GMT");
 
-        char charToReplace = 32;
-        char replacementChar = '+';
-
-        timezone = replacer(timezone, charToReplace, replacementChar);
-
-        saveCookie(httpServletResponse, timezone);
-
-        TimeZone timeZone = TimeZone.getTimeZone("GMT+" + timezone);
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
 
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
