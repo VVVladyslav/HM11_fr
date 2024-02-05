@@ -25,14 +25,18 @@ public class TimeServlet extends HttpServlet {
 
         String lastTimezone = getTimeFromCookie(httpServletRequest);
         String timezone;
+        boolean writeCokie = true;
 
         if (timeParam == null){
-            timezone = "UTC";
-        }else {
-            if (lastTimezone != null) {
-                timezone = lastTimezone;
-            } else if (timeParam != null) {
+            writeCokie = false;
+        }
+            if (timeParam != null) {
                 timezone = timeParam;
+
+            }
+            else if (lastTimezone != null) {
+                timezone = lastTimezone;
+
             } else {
                 timezone = "UTC";
             }
@@ -43,9 +47,9 @@ public class TimeServlet extends HttpServlet {
             char replacementChar = '+';
 
             timezone = replacer(timezone, charToReplace, replacementChar);
-
-            saveCookie(httpServletResponse, timezone);
-        }
+            if (writeCokie){
+                saveCookie(httpServletResponse, timezone);
+            }
         timezone = timezone.replace("UTC", "GMT");
 
         TimeZone timeZone = TimeZone.getTimeZone(timezone);
